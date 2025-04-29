@@ -1,1 +1,1 @@
-A silly YGO CLI that uses the YGOPRODECK API and shows the YGO cards as ASCII Art in the terminal
+A silly YGO CLI that uses the YGOPRODECK API and shows the YGO cards as ANSI Art in the terminal

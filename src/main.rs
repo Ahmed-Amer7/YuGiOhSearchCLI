@@ -120,15 +120,20 @@ fn select_card(cards: Response) -> () {
     print_image(&cards.data[chosen]);
 }
 
-fn print_details(card: &Card) {
+fn print_details(card: &Card) -> Option<String> {
     let name = format!("{}", "Name:").red();
     let atk = format!("{}", "ATK:").red();
     let def = format!("{}", "DEF:").red();
-    println!("{name} {}", card.name.clone().unwrap().bright_blue());
-    if card.r#type.clone().unwrap() != "Trap Card" && card.r#type.clone().unwrap() != "Spell Card" {
-        println!("{atk} {}", card.atk.clone().unwrap().to_string().bright_blue());
-        println!("{def} {}", card.def.clone().unwrap().to_string().bright_blue());
+    println!("{name} {}", card.name.clone()?.bright_blue());
+
+    if card.r#type.clone()?.contains("Monster") {
+        println!("{atk} {}", card.atk?.to_string().bright_blue());
     }
+    if card.r#type.clone()?.contains("Monster") && card.r#type.clone()? != "Link Monster" {
+        println!("{def} {}", card.def?.to_string().bright_blue());
+    }
+
+    None
 }
 
 fn print_image(card: &Card) {
@@ -149,6 +154,6 @@ fn print_image(card: &Card) {
 
     ops::write_ansi_truecolor(&mut std::io::stdout(), &resized);
 
-    let desc = format!("{}", "Desc:").red();
+    let desc = format!("{}", "Description:").red();
     println!("{desc} {}", card.desc.clone().unwrap().bright_blue());
 }
