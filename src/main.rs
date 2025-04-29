@@ -7,9 +7,10 @@ use serde::{Deserialize, Serialize};
 use tempfile::NamedTempFile;
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Card{
+struct Card {
     name: Option<String>,
     id: Option<i32>,
+    r#type: Option<String>,
     atk: Option<i32>,
     def: Option<i32>,
     archetype: Option<String>,
@@ -57,7 +58,7 @@ fn main() {
         std::io::stdin().read_line(&mut again).expect("y or n");
 
         match again.trim() {
-            "y" | "Y" => {},
+            "y" | "Y" | "yes" | "Yes" => {},
             _ => { keep_going = false; }
         }
 
@@ -72,7 +73,6 @@ fn call_api(chosen_card: &String) -> Option<Response> {
     if !res.status().is_success() {
         println!("That's an Invalid Card Name, Try Again");
         return None;
-        // return Err("Failed to fetch card data".into());
     }
 
     let res: Response = res.json().unwrap();
@@ -80,7 +80,6 @@ fn call_api(chosen_card: &String) -> Option<Response> {
     if res.data.is_empty() {
         println!("No cards found for '{}'", chosen_card.trim());
         return None;
-        // return Err("No card data returned".into());
     }
 
     for (index, card) in res.data.iter().enumerate() {
@@ -126,8 +125,10 @@ fn print_details(card: &Card) {
     let atk = format!("{}", "ATK:").red();
     let def = format!("{}", "DEF:").red();
     println!("{name} {}", card.name.clone().unwrap().bright_blue());
-    println!("{atk} {}", card.atk.clone().unwrap().to_string().bright_blue());
-    println!("{def} {}", card.def.clone().unwrap().to_string().bright_blue());
+    if card.r#type.clone().unwrap() != "Trap Card" && card.r#type.clone().unwrap() != "Spell Card" {
+        println!("{atk} {}", card.atk.clone().unwrap().to_string().bright_blue());
+        println!("{def} {}", card.def.clone().unwrap().to_string().bright_blue());
+    }
 }
 
 fn print_image(card: &Card) {
