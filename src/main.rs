@@ -1,10 +1,10 @@
-use std::io::Write;
-use image::GenericImageView;
-use termimage::ops;
 use colored::Colorize;
+use image::GenericImageView;
 use reqwest::blocking::get;
 use serde::{Deserialize, Serialize};
+use std::io::Write;
 use tempfile::NamedTempFile;
+use termimage::ops;
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Card {
@@ -20,12 +20,12 @@ struct Card {
 
 #[derive(Debug, Deserialize, Serialize)]
 struct CardImages {
-    image_url: Option<String>
+    image_url: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 struct Response {
-    data: Vec<Card>
+    data: Vec<Card>,
 }
 
 fn main() {
@@ -37,12 +37,12 @@ fn main() {
         print!("{}", "Enter A Card Name: ".green());
         std::io::stdout().flush().unwrap();
 
-        std::io::stdin().read_line(&mut chosen_card).expect("Enter a valid Yu-Gi-Oh! Card Name");
+        std::io::stdin()
+            .read_line(&mut chosen_card)
+            .expect("Enter a valid Yu-Gi-Oh! Card Name");
 
         let res = match call_api(&chosen_card) {
-            Some(res) => {
-                res
-            },
+            Some(res) => res,
             None => {
                 continue;
             }
@@ -52,22 +52,28 @@ fn main() {
 
         let mut again = String::new();
 
-        print!("{}", "Do You Want to Search Another Card? Type y For Yes: ".green());
+        print!(
+            "{}",
+            "Do You Want to Search Another Card? Type y For Yes: ".green()
+        );
         std::io::stdout().flush().unwrap();
 
         std::io::stdin().read_line(&mut again).expect("y or n");
 
         match again.trim() {
-            "y" | "Y" | "yes" | "Yes" => {},
-            _ => { keep_going = false; }
+            "y" | "Y" | "yes" | "Yes" => {}
+            _ => {
+                keep_going = false;
+            }
         }
-
     }
 }
 
 fn call_api(chosen_card: &String) -> Option<Response> {
-
-    let url = format!("https://db.ygoprodeck.com/api/v7/cardinfo.php?fname={}", chosen_card.trim());
+    let url = format!(
+        "https://db.ygoprodeck.com/api/v7/cardinfo.php?fname={}",
+        chosen_card.trim()
+    );
     let res = get(&url).unwrap();
 
     if !res.status().is_success() {
@@ -84,9 +90,12 @@ fn call_api(chosen_card: &String) -> Option<Response> {
 
     for (index, card) in res.data.iter().enumerate() {
         let idx_part = format!("[{}]", index).red();
-        let name_part = format!("{}", serde_json::to_string_pretty(&card.name).unwrap().blue());
+        let name_part = format!(
+            "{}",
+            serde_json::to_string_pretty(&card.name).unwrap().blue()
+        );
         println!("{idx_part} {name_part}");
-    };
+    }
 
     return Some(res);
     // Ok(res)
@@ -98,17 +107,19 @@ fn select_card(cards: Response) -> () {
     print!("{}", "Select A Card Index: ".green());
     std::io::stdout().flush().unwrap();
 
-    std::io::stdin().read_line(&mut chosen).expect("Entered an Invalid Number!");
-    
+    std::io::stdin()
+        .read_line(&mut chosen)
+        .expect("Entered an Invalid Number!");
+
     let chosen = match chosen.trim().parse::<usize>() {
-        Ok(num) => { 
+        Ok(num) => {
             if num < cards.data.len() {
                 num
             } else {
                 println!("Entered Invalid Index, Searching for First Card");
                 0
             }
-        },
+        }
         Err(_) => {
             println!("Entered Invalid Index, Searching for First Card");
             0
