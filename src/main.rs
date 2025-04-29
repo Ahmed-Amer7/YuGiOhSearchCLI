@@ -103,7 +103,7 @@ fn select_card(cards: Response) -> () {
     
     let chosen = match chosen.trim().parse::<usize>() {
         Ok(num) => { 
-            if num > cards.data.len() {
+            if num < cards.data.len() {
                 num
             } else {
                 println!("Entered Invalid Index, Searching for First Card");
