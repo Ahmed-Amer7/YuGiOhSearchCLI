@@ -1,0 +1,13 @@
+[package]
+name = "cards"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+reqwest = { version = "*", features = ["blocking", "json"]}
+serde = {version = "*", features = ["derive"]}
+serde_json = { version = "*"}
+colored = "*"
+termimage = "*"
+tempfile = "*"
+image = "*"
